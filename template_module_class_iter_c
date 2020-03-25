@@ -1,0 +1,197 @@
+
+#include "Python.h"
+#include "structmember.h"
+
+#include <stddef.h>
+#include <stdlib.h>
+
+#include <stdint.h>
+#include "rc4.h"
+
+
+/******************************************************************************
+ rc4mod - attributes
+******************************************************************************/
+typedef struct {
+    PyObject_HEAD
+    
+    /* pubic attributes */
+    rc4_ctxt_t ctxt;
+
+} rc4mod_class_context_t;
+
+
+static void
+rc4mod_module_dealloc(rc4mod_class_context_t* self)
+{
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject *
+rc4mod_module_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    rc4mod_class_context_t *self;
+
+    self = (rc4mod_class_context_t *)type->tp_alloc(type, 0);
+    if (self != NULL) {
+        /* OK */
+    }
+
+    return (PyObject *)self;
+}
+
+static int
+rc4mod_module_init(rc4mod_class_context_t *self, PyObject *args, PyObject *kwds)
+{
+    Py_buffer buffer; /* input buffer */
+    unsigned int maxlen;
+
+    /* on attent un bytes(), la clé */
+    if (!PyArg_ParseTuple(
+            args,
+            "s*",
+            &buffer,
+            &maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "key argument must be a bytes()");
+        return -1;
+    }
+
+    /* appel de la fonction rc4 */
+    rc4_init(buffer.buf, buffer.len, &self->ctxt);
+
+    /* GOOD */
+    return 0;
+}
+
+/******************************************************************************
+ Attributs publics
+******************************************************************************/
+static PyMemberDef rc4mod_members[] = {
+    {NULL}  /* Sentinel */
+};
+
+/******************************************************************************
+ Public methods
+******************************************************************************/
+
+/*
+
+iterator.__iter__()
+
+    Return the iterator object itself. This is required to allow both containers and iterators to be used with the for and in statements. This method corresponds to the tp_iter slot of the type structure for Python objects in the Python/C API.
+
+static PyObject *
+rc4mod_iter(PyObject *self)
+{  
+    return self;
+}
+*/
+
+static PyObject *
+rc4mod_next(PyObject *obj)
+{
+    rc4mod_class_context_t *self = (rc4mod_class_context_t *)obj;
+    long r;
+
+    PyObject* ret; /* entier retourné */
+    
+    r = (long)rc4_next(&self->ctxt);
+
+    ret = PyLong_FromLong(r);
+    
+    return ret;
+}
+
+
+static PyMethodDef rc4mod_methods[] = {
+    //{"__iter__", (PyCFunction)rc4mod_iter,  METH_NOARGS, "iter method" },
+    //{"__next__", (PyCFunction)rc4mod_next,  METH_NOARGS, "Next RC4 value" },
+    {NULL}  /* Sentinel */
+};
+
+
+static PyTypeObject rc4mod_class = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "pyrc4.Rc4",                              /* tp_name */
+    sizeof(rc4mod_class),                     /* tp_basicsize */
+    0,                                        /* tp_itemsize */
+    (destructor)rc4mod_module_dealloc,        /* tp_dealloc */
+    0,                                        /* tp_print */
+    0,                                        /* tp_getattr */
+    0,                                        /* tp_setattr */
+    0,                                        /* tp_reserved */
+    0,                                        /* tp_repr */
+    0,                                        /* tp_as_number */
+    0,                                        /* tp_as_sequence */
+    0,                                        /* tp_as_mapping */
+    0,                                        /* tp_hash  */
+    0,                                        /* tp_call */
+    0,                                        /* tp_str */
+    0,                                        /* tp_getattro */
+    0,                                        /* tp_setattro */
+    0,                                        /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
+    "Rc4 class",                              /* tp_doc */
+    0,                                        /* tp_traverse */
+    0,                                        /* tp_clear */
+    0,                                        /* tp_richcompare */
+    0,                                        /* tp_weaklistoffset */
+    PyObject_SelfIter,                        /* tp_iter */
+    rc4mod_next,                              /* tp_iternext */
+    rc4mod_methods,                           /* tp_methods */
+    rc4mod_members,                           /* tp_members */
+    0,                                        /* tp_getset */
+    0,                                        /* tp_base */
+    0,                                        /* tp_dict */
+    0,                                        /* tp_descr_get */
+    0,                                        /* tp_descr_set */
+    0,                                        /* tp_dictoffset */
+    (initproc)rc4mod_module_init,             /* tp_init */
+    0,                                        /* tp_alloc */
+    rc4mod_module_new,                        /* tp_new */
+};
+
+
+/******************************************************************************
+ Les méthodes du module
+******************************************************************************/
+static PyMethodDef pyrc4_methods[] = {
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+};
+
+static struct PyModuleDef rc4mod_module_definition = {
+   PyModuleDef_HEAD_INIT,
+   "pyrc4", /* name of module */
+   "This module implements classes to wrap rc4 library services", /* module documentation, may be NULL */
+   -1,  /* size of per-interpreter state of the module,
+           or -1 if the module keeps state in global variables. */
+   pyrc4_methods
+};
+
+
+PyMODINIT_FUNC
+PyInit_pyrc4(void)
+{
+    PyObject *m;
+
+    /* création du module */
+    m = PyModule_Create(&rc4mod_module_definition);
+    if (m == NULL) {
+        return NULL;
+    }
+
+    /* type creation method */
+    if (PyType_Ready(&rc4mod_class) < 0)
+        return NULL;
+
+    /* ajout du type au module */
+    Py_INCREF(&rc4mod_class);
+    PyModule_AddObject(
+        m,
+        "Rc4",  // nom de la classe "Rc4", utilisée par ex. m = pyrc4.Rc4()
+        (PyObject *)&rc4mod_class);
+
+    return m;
+}
+

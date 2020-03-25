@@ -1,0 +1,38 @@
+# Template Model among, flat, class, class_iter
+# flat: module with global functions only
+# class: module implementing a class
+# class_iter: module implementing an iterator kind of a class
+MODEL: flat
+
+# Module name from Python's point of view
+# so that import MODULE_NAME is done
+MODULE_NAME: pyrc4
+MODULE_DOC: This module implements functions to wrap the RC4 C library
+
+# Python Class name
+#CLASS_NAME: Rc4
+
+# Namespace used in auto-generated C Module
+MODULE_NAMESPACE: rc4mod
+
+# list of needed C includes - formatted as C lines
+OWN_INCLUDES: "#include <stdint.h>\n#include \"rc4.h\"\n"
+
+# Name of anonymous context structure type
+#OWN_ANON_HANDLER_TYPE: rc4mod_handler_t
+
+# dictionary of functions
+# name: (prototype, doc)
+MODULE_FUNCTIONS:
+  "init": [ "init(key: bytes) -> bytes", "Init function" ]
+  "next": [ "next() -> int", "Next function, gives back the next RC4 byte" ]
+
+
+# Open/bind/alloc function
+#OWN_OPEN_FUNC: 
+
+# CLose/Unbind/free function
+#OWN_CLOSE_FUNC:
+
+
+

@@ -1,0 +1,24 @@
+static PyObject *
+{{MODULE_NAMESPACE}}_{{FUNCTION_NAME}}(PyObject *obj, PyObject *args, PyObject *kwds)
+{
+    PyObject* retval; /* return value */
+
+    /* parse arguments */
+    if (!PyArg_ParseTuple(
+            args,
+            "s*", # FILL
+            &key_buffer,
+            &key_maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
+        return NULL;
+    }
+
+    /* FILL */
+
+    /* return None */
+    Py_RETURN_NONE;
+
+    /* or return our Python object */
+    return retval;
+}
