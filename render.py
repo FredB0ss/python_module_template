@@ -64,6 +64,16 @@ def load_template(template):
 
 
 ###############################################################################
+def render_function(arguments, funcname, funcspecs):
+    y = arguments.y.copy()
+    y["FUNCTION_NAME"] = funcname
+    y["FUNCTION_HINT"] = funcspecs[0]
+    y["FUNCTION_DOC"] = funcspecs[1]
+    t = load_template(DEFAULT_FUNCTION_TEMPLATE)
+    s = t.render(y)
+    return s
+
+###############################################################################
 def render(arguments):
 
     if arguments.template and len(arguments.template):
@@ -73,21 +83,17 @@ def render(arguments):
         model = arguments.y["MODEL"]
         template = template_from_model(model)
 
-    print("Using Template File:", template)
+    print("/*\nUsing\n   Specifications File: %s\n    Template File: %s\n*/\n" % (arguments.specs[0], template))
         
     # 1st render functions
     funcs = arguments.y["MODULE_FUNCTIONS"]
 
     rf = []
     for f in funcs:
-        #print("Function", f, funcs[f])
-        y = arguments.y.copy()
-        y["FUNCTION_NAME"] = f
-
-        t = load_template(DEFAULT_FUNCTION_TEMPLATE)
-        s = t.render(y)
-        rf.append(s)
-
+        print("Function", f, funcs[f])
+        rf.append(render_function(arguments, f, funcs[f]))
+        
+    print("Functions Bodies:", rf)
     arguments.y["MODULE_FUNCTIONS"] = [f for f in funcs]
     arguments.y["MODULE_FUNCTIONS_BODY"] = rf
     

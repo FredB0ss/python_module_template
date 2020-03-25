@@ -1,3 +1,8 @@
+/* Function: {{FUNCTION_NAME}}
+   Prototype: {{FUNCTION_HINT}}
+   
+   {{FUNCTION_DOC}} 
+*/
 static PyObject *
 {{MODULE_NAMESPACE}}_{{FUNCTION_NAME}}(PyObject *obj, PyObject *args, PyObject *kwds)
 {
@@ -6,7 +11,7 @@ static PyObject *
     /* parse arguments */
     if (!PyArg_ParseTuple(
             args,
-            "s*", # FILL
+            "s*", /* FILL */
             &key_buffer,
             &key_maxlen)
         ) {
@@ -14,7 +19,7 @@ static PyObject *
         return NULL;
     }
 
-    /* FILL */
+    /* FILL - This is a placeholder for the function logic */
 
     /* return None */
     Py_RETURN_NONE;
