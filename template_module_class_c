@@ -13,7 +13,7 @@
 typedef struct {
     PyObject_HEAD
     
-    /* pubic attributes */
+    /* public attributes */
     {% if OWN_ANON_HANDLER_TYPE is defined %}    
     {{OWN_ANON_HANDLER_TYPE}} h;
     {% endif %}

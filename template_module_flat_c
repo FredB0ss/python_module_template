@@ -9,7 +9,6 @@
 
 {{ OWN_INCLUDES }}
 
-
 /******************************************************************************
  {{MODULE_NAMESPACE}} - Private definitions
 ******************************************************************************/
@@ -34,7 +33,7 @@ static PyMethodDef {{MODULE_NAME}}_methods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-static struct PyModuleDef{{MODULE_NAMESPACE}}_module_definition = {
+static struct PyModuleDef {{MODULE_NAMESPACE}}_module_definition = {
    PyModuleDef_HEAD_INIT,
    "{{MODULE_NAME}}", /* name of module */
    "{{MODULE_DOC}}", /* module documentation, may be NULL */
@@ -50,7 +49,7 @@ PyInit_{{MODULE_NAME}}(void)
     PyObject *m;
 
     /* création du module */
-    m = PyModule_Create(&{{MODULE_NAMESPACE}});
+    m = PyModule_Create(&{{MODULE_NAMESPACE}}_module_definition);
     if (m == NULL) {
         return NULL;
     }

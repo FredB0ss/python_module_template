@@ -65,10 +65,21 @@ def load_template(template):
 
 ###############################################################################
 def render_function(arguments, funcname, funcspecs):
+
+    hint = funcspecs[0]
+    doc = funcspecs[1]
+
+    # Get return type # FFS parameters handling
+    l = hint.split("->")
+    if len(l) > 1:
+        rettype = l[1].strip()
+
     y = arguments.y.copy()
     y["FUNCTION_NAME"] = funcname
-    y["FUNCTION_HINT"] = funcspecs[0]
-    y["FUNCTION_DOC"] = funcspecs[1]
+    y["FUNCTION_HINT"] = hint
+    y["FUNCTION_DOC"] = doc
+    y["FUNCTION_RETTYPE"] = rettype
+    
     t = load_template(DEFAULT_FUNCTION_TEMPLATE)
     s = t.render(y)
     return s
@@ -90,10 +101,10 @@ def render(arguments):
 
     rf = []
     for f in funcs:
-        print("Function", f, funcs[f])
+        #print("Function", f, funcs[f])
         rf.append(render_function(arguments, f, funcs[f]))
         
-    print("Functions Bodies:", rf)
+    #print("Functions Bodies:", rf)
     arguments.y["MODULE_FUNCTIONS"] = [f for f in funcs]
     arguments.y["MODULE_FUNCTIONS_BODY"] = rf
     

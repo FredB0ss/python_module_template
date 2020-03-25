@@ -6,8 +6,13 @@
 static PyObject *
 {{MODULE_NAMESPACE}}_{{FUNCTION_NAME}}(PyObject *obj, PyObject *args, PyObject *kwds)
 {
+    
+    Py_buffer key_buffer; /* input buffer */
+    unsigned int key_maxlen;
+    {% if "None" != FUNCTION_RETTYPE %}
     PyObject* retval; /* return value */
-
+    {% endif %}
+    
     /* parse arguments */
     if (!PyArg_ParseTuple(
             args,
@@ -21,9 +26,11 @@ static PyObject *
 
     /* FILL - This is a placeholder for the function logic */
 
-    /* return None */
-    Py_RETURN_NONE;
-
+    {% if "None" != FUNCTION_RETTYPE %}
     /* or return our Python object */
     return retval;
+    {% else %}
+    /* return None */
+    Py_RETURN_NONE;
+    {% endif %}
 }
