@@ -94,22 +94,47 @@ def render(arguments):
 
     print("/*\n    Specifications File: %s\n    Template File: %s\n*/\n" % (arguments.specs[0], template))
         
-    # 1st render functions
-    funcs = meths = []
-    if "MODULE_FUNCTIONS" in arguments.y:
-        funcs = arguments.y["MODULE_FUNCTIONS"]
-    if "CLASS_METHODS" in arguments.y:
-        meths = arguments.y["CLASS_METHODS"]
-
+    # 1st render functions/methods
     rf = []
-    for f in funcs:
-        #print("Function", f, funcs[f])
-        rf.append(render_function(arguments, f, funcs[f]))
-    for m in meths:
-        rf.append(render_function(arguments, m, meths[m]))
+
+    if "flat" == model:
+        funcs = []
+        if "MODULE_FUNCTIONS" in arguments.y:
+            funcs = arguments.y["MODULE_FUNCTIONS"]
+        else:
+            raise ValueError("Flat model but no functions declared")
+        
+        for f in funcs:
+            #print("Function", f, funcs[f])
+            rf.append(render_function(arguments, f, funcs[f]))
+
+    elif "class" == model:
+        meths = []
+        if "CLASS_METHODS" in arguments.y:
+            meths = arguments.y["CLASS_METHODS"]
+        else:
+            raise ValueError("Class model but no methods declared")
+        for m in meths:
+            rf.append(render_function(arguments, m, meths[m]))
+
+    elif "class_iter" == model:
+        if "NEXT_METHOD" in arguments.y:
+            ns = arguments.y["NEXT_METHOD"]
+            # consider it is the only one or the first of the dict
+            n = list(ns.keys())[0]
+            # we add it to our y argument in order to simplify the template
+            arguments.y["NEXT_METHOD_NAME"] = n
+            rf = [render_function(arguments, n, ns[n])]
+        else:
+            raise ValueError("Class Iter model but no next method declared")
+
+        # Optional methods
+        if "CLASS_METHODS" in arguments.y:
+            meths = arguments.y["CLASS_METHODS"]
+            for m in meths:
+                rf.append(render_function(arguments, m, meths[m]))
         
     #print("Functions Bodies:", rf)
-    #arguments.y["MODULE_FUNCTIONS"] = [f for f in funcs]
     arguments.y["MODULE_FUNCTIONS_BODY"] = rf
     
     # render whole module

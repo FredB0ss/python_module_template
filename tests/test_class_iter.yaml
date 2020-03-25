@@ -2,18 +2,20 @@
 # flat: module with global functions only
 # class: module implementing a class
 # class_iter: module implementing an iterator kind of a class
-MODEL: class
+MODEL: class_iter
 
-# Module name from Python's point of view
-# so that import MODULE_NAME is done
+# Module name from Python point of view
+# so that import MODULE_NAME can be done
 MODULE_NAME: pyrc4
-MODULE_DOC: This module implements a Python class to wrap the RC4 C library
+MODULE_DOC: This module implements an iterator class to wrap the RC4 C library
 
 # Python Class name
+# so that you can use MODULE_NAME.CLASS_NAME() to instantiate a object of this
+# class
 CLASS_NAME: Rc4
 
 # Namespace used in auto-generated C Module
-MODULE_NAMESPACE: rc4mod
+MODULE_NAMESPACE: rc4iter
 
 # list of needed C includes - formatted as C lines
 OWN_INCLUDES: "#include <stdio.h>\n#include <stdlib.h>\n"
@@ -24,10 +26,10 @@ OWN_INCLUDES: "#include <stdio.h>\n#include <stdlib.h>\n"
 # - the annotated prototype in the sense of Python3 Types Annotations PEP 484
 #   https://www.python.org/dev/peps/pep-0484/
 # - a documentation string
-CLASS_METHODS:
-  "key": [ "key(key: bytes) -> None", "Key Init function" ]
-  "doit": [ "doit() -> int", "Gives an RC4 byte" ]
+NEXT_METHOD:
+  "my_next": [ "my_next() -> long", "Gives next RC4 byte" ]
 
-
-
-
+# In the particular case of an Iterator Class definition you may also add public
+# methods
+#CLASS_METHODS:
+#  "method_name": ["prototype", "doc" ]

@@ -96,6 +96,7 @@ rc4mod Class Public Methods
    
    Key Init function 
 */
+
 static PyObject *
 rc4mod_key(PyObject *obj, PyObject *args, PyObject *kwds)
 {
@@ -114,7 +115,7 @@ rc4mod_key(PyObject *obj, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
         return NULL;
     }
-
+    
     /* FILL - This is a placeholder for the function logic */
 
     
@@ -123,11 +124,13 @@ rc4mod_key(PyObject *obj, PyObject *args, PyObject *kwds)
     
 }
 
+
 /* Function: doit
    Prototype: doit() -> int
    
    Gives an RC4 byte 
 */
+
 static PyObject *
 rc4mod_doit(PyObject *obj, PyObject *args, PyObject *kwds)
 {
@@ -148,7 +151,7 @@ rc4mod_doit(PyObject *obj, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
         return NULL;
     }
-
+    
     /* FILL - This is a placeholder for the function logic */
 
     
@@ -156,6 +159,7 @@ rc4mod_doit(PyObject *obj, PyObject *args, PyObject *kwds)
     return retval;
     
 }
+
 
 
 

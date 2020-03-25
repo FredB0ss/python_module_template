@@ -3,6 +3,28 @@
    
    {{FUNCTION_DOC}} 
 */
+{% if NEXT_METHOD_NAME is defined %}
+/* Iter next() method takes only 1 argument = self */
+static PyObject *
+{{MODULE_NAMESPACE}}_class_{{FUNCTION_NAME}}(PyObject *obj)
+{
+    PyObject* retval; /* return value */
+
+    /* FILL - This is a placeholder for your iterator logic
+    long r;
+    
+    r = ...
+    
+    retval = PyLong_FromLong(r);
+    */
+
+    /* when the iterator ends make it return NULL */
+    retval = NULL; /* => this raises StopIteration */
+
+    return retval;
+
+}
+{% else %}
 static PyObject *
 {{MODULE_NAMESPACE}}_{{FUNCTION_NAME}}(PyObject *obj, PyObject *args, PyObject *kwds)
 {
@@ -23,7 +45,7 @@ static PyObject *
         PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
         return NULL;
     }
-
+    
     /* FILL - This is a placeholder for the function logic */
 
     {% if "None" != FUNCTION_RETTYPE %}
@@ -34,3 +56,4 @@ static PyObject *
     Py_RETURN_NONE;
     {% endif %}
 }
+{% endif %}

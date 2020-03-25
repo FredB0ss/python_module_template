@@ -1,52 +1,45 @@
+/*
+    Specifications File: test_class_iter.yaml
+    Template File: ../template_module_class_iter_c
+*/
+
 
 #include "Python.h"
 #include "structmember.h"
 
-{{ OWN_INCLUDES }}
+#include <stdio.h>
+#include <stdlib.h>
+
 
 /******************************************************************************
- {{MODULE_NAMESPACE}} - attributes
+ rc4iter - attributes
 ******************************************************************************/
 typedef struct {
     PyObject_HEAD
     
-    /* private attributes if not declared in {{MODULE_NAMESPACE}}_class_members[] below
+    /* private attributes if not declared in rc4iter_class_members[] below
     rc4_ctxt_t ctxt;
     */
 
-} {{MODULE_NAMESPACE}}_class;
+} rc4iter_class;
 
 
 static void
-{{MODULE_NAMESPACE}}_class_dealloc({{MODULE_NAMESPACE}}_class* self)
+rc4iter_class_dealloc(rc4iter_class* self)
 {
-    {% if OWN_CLOSE_FUNC is defined %}    
-    if (NULL != self->h)
-    {
-        {{OWN_CLOSE_FUNC}}(self->h);
-        self->h = NULL;
-    }
-    {% endif %}
+    
 
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject *
-{{MODULE_NAMESPACE}}_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+rc4iter_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    {{MODULE_NAMESPACE}}_class *self;
+    rc4iter_class *self;
 
-    self = ({{MODULE_NAMESPACE}}_class *)type->tp_alloc(type, 0);
+    self = (rc4iter_class *)type->tp_alloc(type, 0);
     if (self != NULL) {
-        {% if OWN_OPEN_FUNC is defined %}
-        /* on fait l'open là, car s'il échoue on ne créé pas l'objet */
-        self->h = {{OWN_OPEN_FUNC}}();
-
-        if (NULL == self->h) {
-            /* ERROR ! */
-            self = NULL;
-        }
-        {% endif %}
+        
     }
 
     return (PyObject *)self;
@@ -58,7 +51,7 @@ static PyObject *
  You may fill the blank if needed
 *******************************************************************************/
 static int
-{{MODULE_NAMESPACE}}_class_init({{MODULE_NAMESPACE}}_class *self, PyObject *args, PyObject *kwds)
+rc4iter_class_init(rc4iter_class *self, PyObject *args, PyObject *kwds)
 {
     Py_buffer buffer; /* input buffer */
     unsigned int maxlen;
@@ -83,9 +76,9 @@ static int
 }
 
 /******************************************************************************
- {{MODULE_NAMESPACE}} Class Public Attributes
+ rc4iter Class Public Attributes
 ******************************************************************************/
-static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
+static PyMemberDef rc4iter_class_members[] = {
     {NULL}  /* Sentinel */
 };
 
@@ -94,24 +87,50 @@ static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
 ******************************************************************************/
 
 /******************************************************************************
-{{MODULE_NAMESPACE}} Class Public Methods
+rc4iter Class Public Methods
 ******************************************************************************/
-{% for func_body in MODULE_FUNCTIONS_BODY %}
-{{func_body}}
-{% endfor %}
+
+/* Function: my_next
+   Prototype: my_next() -> long
+   
+   Gives next RC4 byte 
+*/
+
+/* Iter next() method takes only 1 argument = self */
+static PyObject *
+rc4iter_class_my_next(PyObject *obj)
+{
+    PyObject* retval; /* return value */
+
+    /* FILL - This is a placeholder for your iterator logic
+    long r;
+    
+    r = ...
+    
+    retval = PyLong_FromLong(r);
+    */
+
+    /* when the iterator ends make it return NULL */
+    retval = NULL; /* => this raises StopIteration */
+
+    return retval;
+
+}
 
 
-static PyMethodDef {{MODULE_NAMESPACE}}_class_methods[] = {
+
+
+static PyMethodDef rc4iter_class_methods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
 
-static PyTypeObject {{MODULE_NAMESPACE}}_type = {
+static PyTypeObject rc4iter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "{{MODULE_NAME}}.{{CLASS_NAME}}",               /* tp_name */
-    sizeof({{MODULE_NAMESPACE}}_class),             /* tp_basicsize */
+    "pyrc4.Rc4",               /* tp_name */
+    sizeof(rc4iter_class),             /* tp_basicsize */
     0,                                              /* tp_itemsize */
-    (destructor){{MODULE_NAMESPACE}}_class_dealloc, /* tp_dealloc */
+    (destructor)rc4iter_class_dealloc, /* tp_dealloc */
     0,                                              /* tp_print */
     0,                                              /* tp_getattr */
     0,                                              /* tp_setattr */
@@ -127,65 +146,65 @@ static PyTypeObject {{MODULE_NAMESPACE}}_type = {
     0,                                              /* tp_setattro */
     0,                                              /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,       /* tp_flags */
-    "{{MODULE_NAMESPACE}} class",                   /* tp_doc */
+    "rc4iter class",                   /* tp_doc */
     0,                                              /* tp_traverse */
     0,                                              /* tp_clear */
     0,                                              /* tp_richcompare */
     0,                                              /* tp_weaklistoffset */
     PyObject_SelfIter,                              /* tp_iter */
-    {{MODULE_NAMESPACE}}_class_{{NEXT_METHOD_NAME}},/* tp_iternext */
-    {{MODULE_NAMESPACE}}_class_methods,             /* tp_methods */
-    {{MODULE_NAMESPACE}}_class_members,             /* tp_members */
+    rc4iter_class_my_next,/* tp_iternext */
+    rc4iter_class_methods,             /* tp_methods */
+    rc4iter_class_members,             /* tp_members */
     0,                                              /* tp_getset */
     0,                                              /* tp_base */
     0,                                              /* tp_dict */
     0,                                              /* tp_descr_get */
     0,                                              /* tp_descr_set */
     0,                                              /* tp_dictoffset */
-    (initproc){{MODULE_NAMESPACE}}_class_init,      /* tp_init */
+    (initproc)rc4iter_class_init,      /* tp_init */
     0,                                              /* tp_alloc */
-    {{MODULE_NAMESPACE}}_class_new,                 /* tp_new */
+    rc4iter_class_new,                 /* tp_new */
 };
 
 
 /******************************************************************************
  Les méthodes du module
 ******************************************************************************/
-static PyMethodDef {{MODULE_NAME}}_methods[] = {
+static PyMethodDef pyrc4_methods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-static struct PyModuleDef {{MODULE_NAMESPACE}}_module_definition = {
+static struct PyModuleDef rc4iter_module_definition = {
    PyModuleDef_HEAD_INIT,
-   "{{MODULE_NAME}}", /* name of module */
-   "This module implements classes to wrap {{MODULE_NAMESPACE}} library services", /* module documentation, may be NULL */
+   "pyrc4", /* name of module */
+   "This module implements classes to wrap rc4iter library services", /* module documentation, may be NULL */
    -1,  /* size of per-interpreter state of the module,
            or -1 if the module keeps state in global variables. */
-   {{MODULE_NAME}}_methods
+   pyrc4_methods
 };
 
 
 PyMODINIT_FUNC
-PyInit_{{MODULE_NAME}}(void)
+PyInit_pyrc4(void)
 {
     PyObject *m;
 
     /* type creation method */
-    if (PyType_Ready(&{{MODULE_NAMESPACE}}_type) < 0)
+    if (PyType_Ready(&rc4iter_type) < 0)
         return NULL;
 
     /* création du module */
-    m = PyModule_Create(&{{MODULE_NAMESPACE}}_module_definition);
+    m = PyModule_Create(&rc4iter_module_definition);
     if (m == NULL) {
         return NULL;
     }
 
     /* ajout du type au module */
-    Py_INCREF(&{{MODULE_NAMESPACE}}_type);
+    Py_INCREF(&rc4iter_type);
     PyModule_AddObject(
         m,
-        "{{CLASS_NAME}}",  // nom de la classe "{{CLASS_NAME}}", utilisée par ex. m = {{MODULE_NAME}}.{{CLASS_NAME}}()
-        (PyObject *)&{{MODULE_NAMESPACE}}_type);
+        "Rc4",  // nom de la classe "Rc4", utilisée par ex. m = pyrc4.Rc4()
+        (PyObject *)&rc4iter_type);
 
     return m;
 }

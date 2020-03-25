@@ -4,7 +4,7 @@ OUT=/tmp/out
 REF=ref/
 
 # list of tests to perform
-TESTS="test_flat test_class"
+TESTS="test_flat test_class  test_class_iter"
 
 if [ ! -d "$OUT" ];
 then
@@ -64,7 +64,7 @@ EOF
     cp -vf build/lib.*/pyrc4*.so pyrc4.so
 
     echo "Cleaning"
-    rm -rf build
+    rm -rf setup.py build
     
     echo "Checking Module"
     python3 -c "import pyrc4; print(pyrc4.__doc__, [ (a,getattr(pyrc4,a).__doc__) for a in dir(pyrc4) if callable(getattr(pyrc4, a))])" && echo "$t OK"

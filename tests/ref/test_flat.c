@@ -31,6 +31,7 @@
    
    Init function 
 */
+
 static PyObject *
 rc4mod_init(PyObject *obj, PyObject *args, PyObject *kwds)
 {
@@ -49,7 +50,7 @@ rc4mod_init(PyObject *obj, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
         return NULL;
     }
-
+    
     /* FILL - This is a placeholder for the function logic */
 
     
@@ -58,11 +59,13 @@ rc4mod_init(PyObject *obj, PyObject *args, PyObject *kwds)
     
 }
 
+
 /* Function: next
    Prototype: next() -> int
    
    Next function, gives back the next RC4 byte 
 */
+
 static PyObject *
 rc4mod_next(PyObject *obj, PyObject *args, PyObject *kwds)
 {
@@ -83,7 +86,7 @@ rc4mod_next(PyObject *obj, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
         return NULL;
     }
-
+    
     /* FILL - This is a placeholder for the function logic */
 
     
@@ -91,6 +94,7 @@ rc4mod_next(PyObject *obj, PyObject *args, PyObject *kwds)
     return retval;
     
 }
+
 
 
 
