@@ -1,0 +1,179 @@
+
+#include "Python.h"
+#include "structmember.h"
+
+{{ OWN_INCLUDES }}
+
+/******************************************************************************
+ {{MODULE_NAMESPACE}} - attributes
+******************************************************************************/
+typedef struct {
+    PyObject_HEAD
+    
+    /* private attributes if not declared in {{MODULE_NAMESPACE}}_class_members[] below */
+    rc4_ctxt_t ctxt;
+
+    uint32_t count;
+    
+} {{MODULE_NAMESPACE}}_class_t;
+
+
+static void
+{{MODULE_NAMESPACE}}_class_dealloc({{MODULE_NAMESPACE}}_class_t* self)
+{
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject *
+{{MODULE_NAMESPACE}}_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    {{MODULE_NAMESPACE}}_class_t *self;
+
+    self = ({{MODULE_NAMESPACE}}_class_t *)type->tp_alloc(type, 0);
+    if (self)
+    {
+        self->count = 0;
+    }
+    
+    return (PyObject *)self;
+}
+
+/*******************************************************************************
+ Class __init__() function
+
+ You may fill the blank if needed
+*******************************************************************************/
+static int
+{{MODULE_NAMESPACE}}_class_init({{MODULE_NAMESPACE}}_class_t *self, PyObject *args, PyObject *kwds)
+{
+    Py_buffer buffer; /* input buffer */
+    unsigned int maxlen;
+
+    /* Example, expect a Bytes sequence which is the key */
+    if (!PyArg_ParseTuple(
+            args,
+            "s*",
+            &buffer,
+            &maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "key argument must be a bytes()");
+        return -1;
+    }
+
+    /* call to proper init function */
+    rc4_init(buffer.buf, buffer.len, &self->ctxt);
+
+    /* OK */
+    return 0;
+}
+
+/******************************************************************************
+ {{MODULE_NAMESPACE}} Class Public Attributes
+******************************************************************************/
+static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
+    {"count",  T_ULONG,     offsetof({{MODULE_NAMESPACE}}_class_t, count),   0, "{{MODULE_NAMESPACE}} number of generated RC4 bytes"},
+
+    {NULL}  /* Sentinel */
+};
+
+/******************************************************************************
+ Public methods
+******************************************************************************/
+
+/******************************************************************************
+{{MODULE_NAMESPACE}} Class Public Methods
+******************************************************************************/
+{% for func_body in MODULE_FUNCTIONS_BODY %}
+{{func_body}}
+{% endfor %}
+
+
+static PyMethodDef {{MODULE_NAMESPACE}}_class_methods[] = {
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+};
+
+
+static PyTypeObject {{MODULE_NAMESPACE}}_type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "{{MODULE_NAME}}.{{CLASS_NAME}}",               /* tp_name */
+    sizeof({{MODULE_NAMESPACE}}_class_t),           /* tp_basicsize */
+    0,                                              /* tp_itemsize */
+    (destructor){{MODULE_NAMESPACE}}_class_dealloc, /* tp_dealloc */
+    0,                                              /* tp_print */
+    0,                                              /* tp_getattr */
+    0,                                              /* tp_setattr */
+    0,                                              /* tp_reserved */
+    0,                                              /* tp_repr */
+    0,                                              /* tp_as_number */
+    0,                                              /* tp_as_sequence */
+    0,                                              /* tp_as_mapping */
+    0,                                              /* tp_hash  */
+    0,                                              /* tp_call */
+    0,                                              /* tp_str */
+    0,                                              /* tp_getattro */
+    0,                                              /* tp_setattro */
+    0,                                              /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,       /* tp_flags */
+    "{{MODULE_NAMESPACE}} class",                   /* tp_doc */
+    0,                                              /* tp_traverse */
+    0,                                              /* tp_clear */
+    0,                                              /* tp_richcompare */
+    0,                                              /* tp_weaklistoffset */
+    PyObject_SelfIter,                              /* tp_iter */
+    {{MODULE_NAMESPACE}}_class_{{NEXT_METHOD_NAME}},/* tp_iternext */
+    {{MODULE_NAMESPACE}}_class_methods,             /* tp_methods */
+    {{MODULE_NAMESPACE}}_class_members,             /* tp_members */
+    0,                                              /* tp_getset */
+    0,                                              /* tp_base */
+    0,                                              /* tp_dict */
+    0,                                              /* tp_descr_get */
+    0,                                              /* tp_descr_set */
+    0,                                              /* tp_dictoffset */
+    (initproc){{MODULE_NAMESPACE}}_class_init,      /* tp_init */
+    0,                                              /* tp_alloc */
+    {{MODULE_NAMESPACE}}_class_new,                 /* tp_new */
+};
+
+
+/******************************************************************************
+ Les méthodes du module
+******************************************************************************/
+static PyMethodDef {{MODULE_NAME}}_methods[] = {
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+};
+
+static struct PyModuleDef {{MODULE_NAMESPACE}}_module_definition = {
+   PyModuleDef_HEAD_INIT,
+   "{{MODULE_NAME}}", /* name of module */
+   "This module implements classes to wrap {{MODULE_NAMESPACE}} library services", /* module documentation, may be NULL */
+   -1,  /* size of per-interpreter state of the module,
+           or -1 if the module keeps state in global variables. */
+   {{MODULE_NAME}}_methods
+};
+
+
+PyMODINIT_FUNC
+PyInit_{{MODULE_NAME}}(void)
+{
+    PyObject *m;
+
+    /* type creation method */
+    if (PyType_Ready(&{{MODULE_NAMESPACE}}_type) < 0)
+        return NULL;
+
+    /* création du module */
+    m = PyModule_Create(&{{MODULE_NAMESPACE}}_module_definition);
+    if (m == NULL) {
+        return NULL;
+    }
+
+    /* ajout du type au module */
+    Py_INCREF(&{{MODULE_NAMESPACE}}_type);
+    PyModule_AddObject(
+        m,
+        "{{CLASS_NAME}}",  // nom de la classe "{{CLASS_NAME}}", utilisée par ex. m = {{MODULE_NAME}}.{{CLASS_NAME}}()
+        (PyObject *)&{{MODULE_NAMESPACE}}_type);
+
+    return m;
+}
+

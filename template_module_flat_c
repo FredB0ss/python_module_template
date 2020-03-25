@@ -1,0 +1,59 @@
+
+#include "Python.h"
+#include "structmember.h"
+
+/*
+#include <stddef.h>
+#include <stdlib.h>
+*/
+
+{{ OWN_INCLUDES }}
+
+/******************************************************************************
+ {{MODULE_NAMESPACE}} - Private definitions
+******************************************************************************/
+
+/* insert your code here */
+
+/******************************************************************************
+ {{MODULE_NAMESPACE}} -  Public functions
+******************************************************************************/
+{% for func_body in MODULE_FUNCTIONS_BODY %}
+{{func_body}}
+{% endfor %}
+
+
+/******************************************************************************
+ Module Methods Array
+******************************************************************************/
+static PyMethodDef {{MODULE_NAME}}_methods[] = {
+    {% for func in MODULE_FUNCTIONS %}
+    {"{{func}}", (PyCFunction){{MODULE_NAMESPACE}}_{{func}},  METH_VARARGS, "{{MODULE_FUNCTIONS[func][1]}}" },
+    {% endfor %}
+    {NULL, NULL, 0, NULL}        /* Sentinel */
+};
+
+static struct PyModuleDef {{MODULE_NAMESPACE}}_module_definition = {
+   PyModuleDef_HEAD_INIT,
+   "{{MODULE_NAME}}", /* name of module */
+   "{{MODULE_DOC}}", /* module documentation, may be NULL */
+   -1,  /* size of per-interpreter state of the module,
+           or -1 if the module keeps state in global variables. */
+   {{MODULE_NAME}}_methods
+};
+
+
+PyMODINIT_FUNC
+PyInit_{{MODULE_NAME}}(void)
+{
+    PyObject *m;
+
+    /* création du module */
+    m = PyModule_Create(&{{MODULE_NAMESPACE}}_module_definition);
+    if (m == NULL) {
+        return NULL;
+    }
+
+    return m;
+}
+
