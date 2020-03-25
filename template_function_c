@@ -1,0 +1,59 @@
+/* Function: {{FUNCTION_NAME}}
+   Prototype: {{FUNCTION_HINT}}
+   
+   {{FUNCTION_DOC}} 
+*/
+{% if NEXT_METHOD_NAME is defined %}
+/* Iter next() method takes only 1 argument = self */
+static PyObject *
+{{MODULE_NAMESPACE}}_class_{{FUNCTION_NAME}}(PyObject *obj)
+{
+    PyObject* retval; /* return value */
+
+    /* FILL - This is a placeholder for your iterator logic
+    long r;
+    
+    r = ...
+    
+    retval = PyLong_FromLong(r);
+    */
+
+    /* when the iterator ends make it return NULL */
+    retval = NULL; /* => this raises StopIteration */
+
+    return retval;
+
+}
+{% else %}
+static PyObject *
+{{MODULE_NAMESPACE}}_{{FUNCTION_NAME}}(PyObject *obj, PyObject *args, PyObject *kwds)
+{
+    Py_buffer key_buffer; /* input buffer */
+    unsigned int key_maxlen;
+
+    {% if "None" != FUNCTION_RETTYPE %}
+    PyObject* retval; /* return value */
+    {% endif %}
+
+    /* parse arguments */
+    if (!PyArg_ParseTuple(
+            args,
+            "s*", /* FILL */
+            &key_buffer,
+            &key_maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
+        return NULL;
+    }
+    
+    /* FILL - This is a placeholder for the function logic */
+
+    {% if "None" != FUNCTION_RETTYPE %}
+    /* or return our Python object */
+    return retval;
+    {% else %}
+    /* return None */
+    Py_RETURN_NONE;
+    {% endif %}
+}
+{% endif %}

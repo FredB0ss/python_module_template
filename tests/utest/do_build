@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo "Clean..."
+rm -rf build/
+
+echo "Build..."
+# version dynamique
+# 1) prépare le .so
+#gcc -shared -Wl,--whole-archive ../mylib/libmylib.a -Wl,-no-whole-archive -o libmylib.so
+# 2) appeler le setup.py modifié pour linker avec la libmylib.so
+
+# version statique
+echo "Compiling rc4.c"
+gcc -Wall -Wextra -I .. -o rc4.o -c ../rc4.c
+
+echo "Creating librc4.a archive"
+ar -crs  librc4.a rc4.o 
+
+echo "Building Python C Module"
+python3 setup.py build && cp build/lib.linux-x86_64-3.7/pyrc4.cpython-37m-x86_64-linux-gnu.so pyrc4.so
+
+echo "Check..."
+# /usr/bin/python3: No module named XXX.__main__; 'XXX' is a package and cannot be directly executed
+#python3 -m pyrc4
+python3 -c "import pyrc4"
+
+echo "Done."
