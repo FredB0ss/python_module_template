@@ -28,7 +28,7 @@
 ******************************************************************************/
 static PyMethodDef {{MODULE_NAME}}_methods[] = {
     {% for func in MODULE_FUNCTIONS %}
-    {"{{func}}", (PyCFunction){{MODULE_NAMESPACE}}_{{func}},  METH_VARARGS, "function {{func}}" },
+    {"{{func}}", (PyCFunction){{MODULE_NAMESPACE}}_{{func}},  METH_VARARGS, "{{MODULE_FUNCTIONS[func][1]}}" },
     {% endfor %}
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };

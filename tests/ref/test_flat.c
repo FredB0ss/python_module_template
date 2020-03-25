@@ -1,8 +1,8 @@
 /*
-Using
-   Specifications File: test_flat.yaml
-    Template File: template_module_flat_c
+    Specifications File: test_flat.yaml
+    Template File: ../template_module_flat_c
 */
+
 
 #include "Python.h"
 #include "structmember.h"
@@ -34,7 +34,10 @@ Using
 static PyObject *
 rc4mod_init(PyObject *obj, PyObject *args, PyObject *kwds)
 {
-    PyObject* retval; /* return value */
+    Py_buffer key_buffer; /* input buffer */
+    unsigned int key_maxlen;
+
+    
 
     /* parse arguments */
     if (!PyArg_ParseTuple(
@@ -49,11 +52,10 @@ rc4mod_init(PyObject *obj, PyObject *args, PyObject *kwds)
 
     /* FILL - This is a placeholder for the function logic */
 
+    
     /* return None */
     Py_RETURN_NONE;
-
-    /* or return our Python object */
-    return retval;
+    
 }
 
 /* Function: next
@@ -64,7 +66,12 @@ rc4mod_init(PyObject *obj, PyObject *args, PyObject *kwds)
 static PyObject *
 rc4mod_next(PyObject *obj, PyObject *args, PyObject *kwds)
 {
+    Py_buffer key_buffer; /* input buffer */
+    unsigned int key_maxlen;
+
+    
     PyObject* retval; /* return value */
+    
 
     /* parse arguments */
     if (!PyArg_ParseTuple(
@@ -79,11 +86,10 @@ rc4mod_next(PyObject *obj, PyObject *args, PyObject *kwds)
 
     /* FILL - This is a placeholder for the function logic */
 
-    /* return None */
-    Py_RETURN_NONE;
-
+    
     /* or return our Python object */
     return retval;
+    
 }
 
 
@@ -93,14 +99,14 @@ rc4mod_next(PyObject *obj, PyObject *args, PyObject *kwds)
 ******************************************************************************/
 static PyMethodDef pyrc4_methods[] = {
     
-    {"init", (PyCFunction)rc4mod_init,  METH_VARARGS, "function init" },
+    {"init", (PyCFunction)rc4mod_init,  METH_VARARGS, "Init function" },
     
-    {"next", (PyCFunction)rc4mod_next,  METH_VARARGS, "function next" },
+    {"next", (PyCFunction)rc4mod_next,  METH_VARARGS, "Next function, gives back the next RC4 byte" },
     
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-static struct PyModuleDefrc4mod_module_definition = {
+static struct PyModuleDef rc4mod_module_definition = {
    PyModuleDef_HEAD_INIT,
    "pyrc4", /* name of module */
    "This module implements functions to wrap the RC4 C library", /* module documentation, may be NULL */
@@ -116,7 +122,7 @@ PyInit_pyrc4(void)
     PyObject *m;
 
     /* création du module */
-    m = PyModule_Create(&rc4mod);
+    m = PyModule_Create(&rc4mod_module_definition);
     if (m == NULL) {
         return NULL;
     }

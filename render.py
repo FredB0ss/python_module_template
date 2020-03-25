@@ -53,9 +53,7 @@ def template_from_model(model):
 
 
 ###############################################################################
-def load_template(template):
-
-    filename = os.path.join(os.path.dirname(__file__), template)
+def load_template(filename):
 
     with open(filename) as f:
         t = jinja2.Template(f.read())
@@ -80,7 +78,7 @@ def render_function(arguments, funcname, funcspecs):
     y["FUNCTION_DOC"] = doc
     y["FUNCTION_RETTYPE"] = rettype
     
-    t = load_template(DEFAULT_FUNCTION_TEMPLATE)
+    t = load_template(os.path.join(os.path.dirname(__file__), DEFAULT_FUNCTION_TEMPLATE))
     s = t.render(y)
     return s
 
@@ -92,20 +90,26 @@ def render(arguments):
     else:
         #print("y=", arguments.y)
         model = arguments.y["MODEL"]
-        template = template_from_model(model)
+        template =     filename = os.path.join(os.path.dirname(__file__), template_from_model(model))
 
-    print("/*\nUsing\n   Specifications File: %s\n    Template File: %s\n*/\n" % (arguments.specs[0], template))
+    print("/*\n    Specifications File: %s\n    Template File: %s\n*/\n" % (arguments.specs[0], template))
         
     # 1st render functions
-    funcs = arguments.y["MODULE_FUNCTIONS"]
+    funcs = meths = []
+    if "MODULE_FUNCTIONS" in arguments.y:
+        funcs = arguments.y["MODULE_FUNCTIONS"]
+    if "CLASS_METHODS" in arguments.y:
+        meths = arguments.y["CLASS_METHODS"]
 
     rf = []
     for f in funcs:
         #print("Function", f, funcs[f])
         rf.append(render_function(arguments, f, funcs[f]))
+    for m in meths:
+        rf.append(render_function(arguments, m, meths[m]))
         
     #print("Functions Bodies:", rf)
-    arguments.y["MODULE_FUNCTIONS"] = [f for f in funcs]
+    #arguments.y["MODULE_FUNCTIONS"] = [f for f in funcs]
     arguments.y["MODULE_FUNCTIONS_BODY"] = rf
     
     # render whole module
@@ -147,7 +151,7 @@ if "__main__" == __name__ :
 
     ap.add_argument("-v", "--verbose", action="store_true", help="verbose mode")
 
-    ap.add_argument("-t", "--template", type=str, nargs="?", default=None, help="Enforce a template file name, when not provided the template file is choosen according to the model name (MODEL field in YAML specs) and is among %s" % DEFAULT_TEMPLATE_FILENAME_LIST_S)
+    ap.add_argument("-t", "--template", type=str, nargs=1, default=None, help="Enforce a template file name, when not provided the template file is choosen according to the model name (MODEL field in YAML specs) and is among %s" % DEFAULT_TEMPLATE_FILENAME_LIST_S)
 
     ap.add_argument("specs", type=str, nargs=1, default=None, help="mandatory YAML specifications file")
 

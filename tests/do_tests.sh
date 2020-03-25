@@ -3,7 +3,8 @@
 OUT=/tmp/out
 REF=ref/
 
-TESTS="test_flat"
+# list of tests to perform
+TESTS="test_flat test_class"
 
 if [ ! -d "$OUT" ];
 then
@@ -24,6 +25,7 @@ cp -vf rc4.h "$OUT/"
 function one_test()
 {
     t="$1"
+    echo "************************ test $t ************************"
     echo "Rendering $OUT/$t.c"
     python3 ../render.py $t.yaml >& "$OUT/$t.c"
 

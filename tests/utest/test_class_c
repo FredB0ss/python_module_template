@@ -68,23 +68,25 @@ static int
     }
 
     /* FILL */
-
+    
     /* GOOD */
     return 0;
 }
 
 /******************************************************************************
- {{MODULE_NAMESPACE}} Class Public Attributes
+ Public Attributes
 ******************************************************************************/
-static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
+static PyMemberDef {{MODULE_NAMESPACE}}_members[] = {
     {"key",  T_ULONG,     offsetof({{MODULE_NAMESPACE}}_class, key),   0, "{{MODULE_NAMESPACE}} key"},
     
     {NULL}  /* Sentinel */
 };
 
 /******************************************************************************
-  Private Functions
+{{MODULE_NAMESPACE}} - methods
 ******************************************************************************/
+
+/* private methods definitions */
 static int {{MODULE_NAMESPACE}}_my_private_method_param({{MODULE_NAMESPACE}}_class* self, uint32_t key)
 {
     /* store in class context */
@@ -95,18 +97,92 @@ static int {{MODULE_NAMESPACE}}_my_private_method_param({{MODULE_NAMESPACE}}_cla
 }
 
 /******************************************************************************
-{{MODULE_NAMESPACE}} Class Public Methods
+ Public methods
 ******************************************************************************/
-{% for func_body in MODULE_FUNCTIONS_BODY %}
-{{func_body}}
-{% endfor %}
+static PyObject *
+{{MODULE_NAMESPACE}}_my_param({{MODULE_NAMESPACE}}_class* self, PyObject *args)
+{
+    unsigned key;
+    int r;
+    
+    /* on attend un entier non signé 32bits */
+    if (!PyArg_ParseTuple(
+            args,
+            "I",
+            &key)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "argument must be an unsigned int !");
+        return NULL;
+    }
+
+    /* appel d'une méthode privée */
+    r = {{MODULE_NAMESPACE}}_my_private_method_param(self, key);
+
+    /* conversion du code de retour en entier Python */
+    return PyLong_FromLong((long)r);
+}
 
 
-static PyMethodDef {{MODULE_NAMESPACE}}_class_methods[] = {
-    {% for meth in CLASS_METHODS %}
-    {"{{meth}}", (PyCFunction){{MODULE_NAMESPACE}}_{{meth}},  METH_VARARGS, "{{CLASS_METHODS[meth][1]}}" },
-    {% endfor %}
-    {NULL, NULL, 0, NULL}        /* Sentinel */
+static PyObject *
+{{MODULE_NAMESPACE}}_my_doit({{MODULE_NAMESPACE}}_class* self, PyObject *args)
+{
+    Py_buffer buffer; /* input buffer */
+    unsigned int maxlen;
+    uint8_t *p_out;
+    size_t outlen;
+
+    PyObject* retbuff; /* buffer retourné */
+    
+    if (!PyArg_ParseTuple(
+            args,
+            "s*I",
+            &buffer,
+            &maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "arguments must be a bytes() and an unsigned int !");
+        return NULL;
+    }
+
+    /* Allocate an output buffer */
+    outlen = (size_t)maxlen;
+    p_out = (uint8_t *)malloc(outlen);
+    
+    if (p_out) {
+        /* Example about how to call an external func
+        r = my_doit(self->h, buffer.buf, buffer.len, p_out, &outlen);
+        if (0 != r) {
+            PyErr_SetString(PyExc_AttributeError, "C function my_doit returned != 0 !");
+            return NULL;
+        }
+        */
+        unsigned i;
+
+        for (i = 0; i < outlen; i++)
+        {
+            uint8_t *p_buf = buffer.buf;
+            p_out[i] = p_buf[i] ^ self->key;
+        }
+
+        /* Prepare the return value as a Python Bytes Sequence */
+        retbuff = PyBytes_FromStringAndSize((const char *)p_out, (Py_ssize_t)outlen);
+
+        /* release our temporary buffer */
+        free(p_out);
+        
+        /* OK case */
+        return retbuff;
+    }
+
+    /* ERROR case */
+    PyErr_SetString(PyExc_AttributeError, "output buffer alloc failed");
+    return NULL;
+}
+
+
+static PyMethodDef {{MODULE_NAMESPACE}}_methods[] = {
+    {"my_param", (PyCFunction){{MODULE_NAMESPACE}}_my_param, METH_VARARGS, "Set starting {{MODULE_NAMESPACE}}" },
+    {"my_doit", (PyCFunction){{MODULE_NAMESPACE}}_my_doit,   METH_VARARGS, "Get current {{MODULE_NAMESPACE}}" },
+    {NULL}  /* Sentinel */
 };
 
 
@@ -138,8 +214,8 @@ static PyTypeObject {{MODULE_NAMESPACE}}_type = {
     0,                                              /* tp_weaklistoffset */
     0,                                              /* tp_iter */
     0,                                              /* tp_iternext */
-    {{MODULE_NAMESPACE}}_class_methods,             /* tp_methods */
-    {{MODULE_NAMESPACE}}_class_members,             /* tp_members */
+    {{MODULE_NAMESPACE}}_methods,                   /* tp_methods */
+    {{MODULE_NAMESPACE}}_members,                   /* tp_members */
     0,                                              /* tp_getset */
     0,                                              /* tp_base */
     0,                                              /* tp_dict */

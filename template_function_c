@@ -6,13 +6,13 @@
 static PyObject *
 {{MODULE_NAMESPACE}}_{{FUNCTION_NAME}}(PyObject *obj, PyObject *args, PyObject *kwds)
 {
-    
     Py_buffer key_buffer; /* input buffer */
     unsigned int key_maxlen;
+
     {% if "None" != FUNCTION_RETTYPE %}
     PyObject* retval; /* return value */
     {% endif %}
-    
+
     /* parse arguments */
     if (!PyArg_ParseTuple(
             args,

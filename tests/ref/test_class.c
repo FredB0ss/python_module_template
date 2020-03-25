@@ -1,11 +1,18 @@
+/*
+    Specifications File: test_class.yaml
+    Template File: ../template_module_class_c
+*/
+
 
 #include "Python.h"
 #include "structmember.h"
 
-{{ OWN_INCLUDES }}
+#include <stdio.h>
+#include <stdlib.h>
+
 
 /******************************************************************************
- {{MODULE_NAMESPACE}} - attributes
+ rc4mod - attributes
 ******************************************************************************/
 typedef struct {
     PyObject_HEAD
@@ -13,39 +20,25 @@ typedef struct {
     /* example how to define a public attribute */
     uint8_t key;
 
-} {{MODULE_NAMESPACE}}_class;
+} rc4mod_class;
 
 
 static void
-{{MODULE_NAMESPACE}}_class_dealloc({{MODULE_NAMESPACE}}_class* self)
+rc4mod_class_dealloc(rc4mod_class* self)
 {
-    {% if OWN_CLOSE_FUNC is defined %}    
-    if (NULL != self->h)
-    {
-        {{OWN_CLOSE_FUNC}}(self->h);
-        self->h = NULL;
-    }
-    {% endif %}
+    
 
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject *
-{{MODULE_NAMESPACE}}_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+rc4mod_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    {{MODULE_NAMESPACE}}_class *self;
+    rc4mod_class *self;
 
-    self = ({{MODULE_NAMESPACE}}_class *)type->tp_alloc(type, 0);
+    self = (rc4mod_class *)type->tp_alloc(type, 0);
     if (self != NULL) {
-        {% if OWN_OPEN_FUNC is defined %}
-        /* on fait l'open là, car s'il échoue on ne créé pas l'objet */
-        self->h = {{OWN_OPEN_FUNC}}();
-
-        if (NULL == self->h) {
-            /* ERROR ! */
-            self = NULL;
-        }
-        {% endif %}
+        
     }
 
     return (PyObject *)self;
@@ -57,7 +50,7 @@ static PyObject *
  You may fill the blank if needed
 *******************************************************************************/
 static int
-{{MODULE_NAMESPACE}}_class_init({{MODULE_NAMESPACE}}_class *self, PyObject *args, PyObject *kwds)
+rc4mod_class_init(rc4mod_class *self, PyObject *args, PyObject *kwds)
 {
     if (!PyArg_ParseTuple(
             args,
@@ -74,10 +67,10 @@ static int
 }
 
 /******************************************************************************
- {{MODULE_NAMESPACE}} Class Public Attributes
+ rc4mod Class Public Attributes
 ******************************************************************************/
-static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
-    {"key",  T_ULONG,     offsetof({{MODULE_NAMESPACE}}_class, key),   0, "{{MODULE_NAMESPACE}} key"},
+static PyMemberDef rc4mod_class_members[] = {
+    {"key",  T_ULONG,     offsetof(rc4mod_class, key),   0, "rc4mod key"},
     
     {NULL}  /* Sentinel */
 };
@@ -85,7 +78,7 @@ static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
 /******************************************************************************
   Private Functions
 ******************************************************************************/
-static int {{MODULE_NAMESPACE}}_my_private_method_param({{MODULE_NAMESPACE}}_class* self, uint32_t key)
+static int rc4mod_my_private_method_param(rc4mod_class* self, uint32_t key)
 {
     /* store in class context */
     self->key = (uint8_t)key;
@@ -95,27 +88,93 @@ static int {{MODULE_NAMESPACE}}_my_private_method_param({{MODULE_NAMESPACE}}_cla
 }
 
 /******************************************************************************
-{{MODULE_NAMESPACE}} Class Public Methods
+rc4mod Class Public Methods
 ******************************************************************************/
-{% for func_body in MODULE_FUNCTIONS_BODY %}
-{{func_body}}
-{% endfor %}
+
+/* Function: key
+   Prototype: key(key: bytes) -> None
+   
+   Key Init function 
+*/
+static PyObject *
+rc4mod_key(PyObject *obj, PyObject *args, PyObject *kwds)
+{
+    Py_buffer key_buffer; /* input buffer */
+    unsigned int key_maxlen;
+
+    
+
+    /* parse arguments */
+    if (!PyArg_ParseTuple(
+            args,
+            "s*", /* FILL */
+            &key_buffer,
+            &key_maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
+        return NULL;
+    }
+
+    /* FILL - This is a placeholder for the function logic */
+
+    
+    /* return None */
+    Py_RETURN_NONE;
+    
+}
+
+/* Function: doit
+   Prototype: doit() -> int
+   
+   Gives an RC4 byte 
+*/
+static PyObject *
+rc4mod_doit(PyObject *obj, PyObject *args, PyObject *kwds)
+{
+    Py_buffer key_buffer; /* input buffer */
+    unsigned int key_maxlen;
+
+    
+    PyObject* retval; /* return value */
+    
+
+    /* parse arguments */
+    if (!PyArg_ParseTuple(
+            args,
+            "s*", /* FILL */
+            &key_buffer,
+            &key_maxlen)
+        ) {
+        PyErr_SetString(PyExc_AttributeError, "arguments must be FILL");
+        return NULL;
+    }
+
+    /* FILL - This is a placeholder for the function logic */
+
+    
+    /* or return our Python object */
+    return retval;
+    
+}
 
 
-static PyMethodDef {{MODULE_NAMESPACE}}_class_methods[] = {
-    {% for meth in CLASS_METHODS %}
-    {"{{meth}}", (PyCFunction){{MODULE_NAMESPACE}}_{{meth}},  METH_VARARGS, "{{CLASS_METHODS[meth][1]}}" },
-    {% endfor %}
+
+static PyMethodDef rc4mod_class_methods[] = {
+    
+    {"key", (PyCFunction)rc4mod_key,  METH_VARARGS, "Key Init function" },
+    
+    {"doit", (PyCFunction)rc4mod_doit,  METH_VARARGS, "Gives an RC4 byte" },
+    
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
 
-static PyTypeObject {{MODULE_NAMESPACE}}_type = {
+static PyTypeObject rc4mod_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "{{MODULE_NAME}}.{{CLASS_NAME}}",               /* tp_name */
-    sizeof({{MODULE_NAMESPACE}}_class),             /* tp_basicsize */
+    "pyrc4.Rc4",               /* tp_name */
+    sizeof(rc4mod_class),             /* tp_basicsize */
     0,                                              /* tp_itemsize */
-    (destructor){{MODULE_NAMESPACE}}_class_dealloc, /* tp_dealloc */
+    (destructor)rc4mod_class_dealloc, /* tp_dealloc */
     0,                                              /* tp_print */
     0,                                              /* tp_getattr */
     0,                                              /* tp_setattr */
@@ -131,65 +190,65 @@ static PyTypeObject {{MODULE_NAMESPACE}}_type = {
     0,                                              /* tp_setattro */
     0,                                              /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,       /* tp_flags */
-    "{{MODULE_NAMESPACE}} class",                   /* tp_doc */
+    "rc4mod class",                   /* tp_doc */
     0,                                              /* tp_traverse */
     0,                                              /* tp_clear */
     0,                                              /* tp_richcompare */
     0,                                              /* tp_weaklistoffset */
     0,                                              /* tp_iter */
     0,                                              /* tp_iternext */
-    {{MODULE_NAMESPACE}}_class_methods,             /* tp_methods */
-    {{MODULE_NAMESPACE}}_class_members,             /* tp_members */
+    rc4mod_class_methods,             /* tp_methods */
+    rc4mod_class_members,             /* tp_members */
     0,                                              /* tp_getset */
     0,                                              /* tp_base */
     0,                                              /* tp_dict */
     0,                                              /* tp_descr_get */
     0,                                              /* tp_descr_set */
     0,                                              /* tp_dictoffset */
-    (initproc){{MODULE_NAMESPACE}}_class_init,      /* tp_init */
+    (initproc)rc4mod_class_init,      /* tp_init */
     0,                                              /* tp_alloc */
-    {{MODULE_NAMESPACE}}_class_new,                 /* tp_new */
+    rc4mod_class_new,                 /* tp_new */
 };
 
 
 /******************************************************************************
  Les méthodes du module
 ******************************************************************************/
-static PyMethodDef {{MODULE_NAME}}_methods[] = {
+static PyMethodDef pyrc4_methods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-static struct PyModuleDef {{MODULE_NAMESPACE}}_module_definition = {
+static struct PyModuleDef rc4mod_module_definition = {
    PyModuleDef_HEAD_INIT,
-   "{{MODULE_NAME}}", /* name of module */
-   "This module implements classes to wrap {{MODULE_NAMESPACE}} library services", /* module documentation, may be NULL */
+   "pyrc4", /* name of module */
+   "This module implements classes to wrap rc4mod library services", /* module documentation, may be NULL */
    -1,  /* size of per-interpreter state of the module,
            or -1 if the module keeps state in global variables. */
-   {{MODULE_NAME}}_methods
+   pyrc4_methods
 };
 
 
 PyMODINIT_FUNC
-PyInit_{{MODULE_NAME}}(void)
+PyInit_pyrc4(void)
 {
     PyObject *m;
 
     /* type creation method */
-    if (PyType_Ready(&{{MODULE_NAMESPACE}}_type) < 0)
+    if (PyType_Ready(&rc4mod_type) < 0)
         return NULL;
 
     /* création du module */
-    m = PyModule_Create(&{{MODULE_NAMESPACE}}_module_definition);
+    m = PyModule_Create(&rc4mod_module_definition);
     if (m == NULL) {
         return NULL;
     }
     
     /* ajout du type au module */
-    Py_INCREF(&{{MODULE_NAMESPACE}}_type);
+    Py_INCREF(&rc4mod_type);
     PyModule_AddObject(
         m,
-        "{{CLASS_NAME}}",  // nom de la classe "{{CLASS_NAME}}", utilisée par ex. m = {{MODULE_NAME}}.{{CLASS_NAME}}()
-        (PyObject *)&{{MODULE_NAMESPACE}}_type);
+        "Rc4",  // nom de la classe "Rc4", utilisée par ex. m = pyrc4.Rc4()
+        (PyObject *)&rc4mod_type);
 
     return m;
 }
