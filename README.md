@@ -200,6 +200,3 @@ Type "help", "copyright", "credits" or "license" for more information.
 10 0x73
 >>> 
 ```  
-  
-
-
