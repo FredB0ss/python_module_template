@@ -108,8 +108,7 @@ MODULE_FUNCTIONS:
 
 Additionaly to the above common fields a class is described by the list of its methods:
 
-CLASS_METHODS: *dict*
-A dictionary of functions, same as MODULE_FUNCTIONS above.
+CLASS_METHODS: *dict*, a dictionary of functions, same as MODULE_FUNCTIONS above.
 
 ### Class Module Specifications Example
 
@@ -129,8 +128,7 @@ CLASS_METHODS:
 
 Additionaly to the above common fields an iterator is described by its next function. It is up to the developper to implement the init function in the resulting generated C file :
 
-NEXT_METHOD: *dict*
-A dictionary of a function, with one single entry describing the "next" function of the iterator. Though unecessary this keeps the same syntax as CLASS_METHODS
+NEXT_METHOD: *dict*, a dictionary of a function, with one single entry describing the "next" function of the iterator. Though unecessary this keeps the same syntax as CLASS_METHODS
 
 Example:
 
@@ -141,8 +139,7 @@ Example:
 
 Optionaly the iterator class may be augmented with others methods, using the following field:
 
-CLASS_METHODS: *dict*
-A dictionary of functions, same as above.
+CLASS_METHODS: *dict*, a dictionary of functions, same as above.
 
 ### Iterator Class Module Specifications Example
 
@@ -221,7 +218,7 @@ distutils.core.setup(
 
   cp build/lib.*/pyrc4.*.so pyrc4.so
   
-- You may use everywhere!:
+- You may now use it everywhere!:
 
   cp pyrc4.so /tmp
   cd /tmp && python3
