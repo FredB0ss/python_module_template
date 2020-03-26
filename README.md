@@ -198,7 +198,6 @@ Type "help", "copyright", "credits" or "license" for more information.
 8 0xba
 9 0x70
 10 0x73
->>> 
 ```
 
 - The Python script test.py shows how two such iterators have distinct contexts:
