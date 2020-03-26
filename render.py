@@ -10,7 +10,8 @@ care of rendering a skeleton that the user completes. The intended module is
 describes by a YAML specifications which is documented thanks to comments.
 
 The idea is to KISS hence the script stops where things get too complicated.
-The human does the rest which might hopefully be the most interesting part.
+The human does the remaining bits which might hopefully be the most interesting
+part.
 
 PyYAML brings the specifications support:
 https://pyyaml.org/
@@ -20,6 +21,11 @@ JINJA2 offers the templating & rendering mechanisms:
 https://jinja.palletsprojects.com/
 
 Both are indexed in the PyPi: https://pypi.org
+
+Basic examples of YAML specifications are provided in the tests directory.
+
+How to produce a C file which the user has to edit it and fill in it with her own C code ?
+$ python3 render.py specs.yaml > file.c
 """
 
 import os
@@ -85,12 +91,12 @@ def render_function(arguments, funcname, funcspecs):
 ###############################################################################
 def render(arguments):
 
+    model = arguments.y["MODEL"]
+    
     if arguments.template and len(arguments.template):
         template = arguments.template[0]
     else:
-        #print("y=", arguments.y)
-        model = arguments.y["MODEL"]
-        template =     filename = os.path.join(os.path.dirname(__file__), template_from_model(model))
+        template = os.path.join(os.path.dirname(__file__), template_from_model(model))
 
     print("/*\n    Specifications File: %s\n    Template File: %s\n*/\n" % (arguments.specs[0], template))
         

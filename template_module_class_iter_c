@@ -14,11 +14,11 @@ typedef struct {
     rc4_ctxt_t ctxt;
     */
 
-} {{MODULE_NAMESPACE}}_class;
+} {{MODULE_NAMESPACE}}_class_t;
 
 
 static void
-{{MODULE_NAMESPACE}}_class_dealloc({{MODULE_NAMESPACE}}_class* self)
+{{MODULE_NAMESPACE}}_class_dealloc({{MODULE_NAMESPACE}}_class_t* self)
 {
     {% if OWN_CLOSE_FUNC is defined %}    
     if (NULL != self->h)
@@ -34,9 +34,9 @@ static void
 static PyObject *
 {{MODULE_NAMESPACE}}_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    {{MODULE_NAMESPACE}}_class *self;
+    {{MODULE_NAMESPACE}}_class_t *self;
 
-    self = ({{MODULE_NAMESPACE}}_class *)type->tp_alloc(type, 0);
+    self = ({{MODULE_NAMESPACE}}_class_t *)type->tp_alloc(type, 0);
     if (self != NULL) {
         {% if OWN_OPEN_FUNC is defined %}
         /* on fait l'open là, car s'il échoue on ne créé pas l'objet */
@@ -58,7 +58,7 @@ static PyObject *
  You may fill the blank if needed
 *******************************************************************************/
 static int
-{{MODULE_NAMESPACE}}_class_init({{MODULE_NAMESPACE}}_class *self, PyObject *args, PyObject *kwds)
+{{MODULE_NAMESPACE}}_class_init({{MODULE_NAMESPACE}}_class_t *self, PyObject *args, PyObject *kwds)
 {
     Py_buffer buffer; /* input buffer */
     unsigned int maxlen;
@@ -109,7 +109,7 @@ static PyMethodDef {{MODULE_NAMESPACE}}_class_methods[] = {
 static PyTypeObject {{MODULE_NAMESPACE}}_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "{{MODULE_NAME}}.{{CLASS_NAME}}",               /* tp_name */
-    sizeof({{MODULE_NAMESPACE}}_class),             /* tp_basicsize */
+    sizeof({{MODULE_NAMESPACE}}_class_t),           /* tp_basicsize */
     0,                                              /* tp_itemsize */
     (destructor){{MODULE_NAMESPACE}}_class_dealloc, /* tp_dealloc */
     0,                                              /* tp_print */

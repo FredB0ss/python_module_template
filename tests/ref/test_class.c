@@ -20,11 +20,11 @@ typedef struct {
     /* example how to define a public attribute */
     uint8_t key;
 
-} rc4mod_class;
+} rc4mod_class_t;
 
 
 static void
-rc4mod_class_dealloc(rc4mod_class* self)
+rc4mod_class_dealloc(rc4mod_class_t* self)
 {
     
 
@@ -34,9 +34,9 @@ rc4mod_class_dealloc(rc4mod_class* self)
 static PyObject *
 rc4mod_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    rc4mod_class *self;
+    rc4mod_class_t *self;
 
-    self = (rc4mod_class *)type->tp_alloc(type, 0);
+    self = (rc4mod_class_t *)type->tp_alloc(type, 0);
     if (self != NULL) {
         
     }
@@ -50,7 +50,7 @@ rc4mod_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  You may fill the blank if needed
 *******************************************************************************/
 static int
-rc4mod_class_init(rc4mod_class *self, PyObject *args, PyObject *kwds)
+rc4mod_class_init(rc4mod_class_t *self, PyObject *args, PyObject *kwds)
 {
     if (!PyArg_ParseTuple(
             args,
@@ -70,7 +70,7 @@ rc4mod_class_init(rc4mod_class *self, PyObject *args, PyObject *kwds)
  rc4mod Class Public Attributes
 ******************************************************************************/
 static PyMemberDef rc4mod_class_members[] = {
-    {"key",  T_ULONG,     offsetof(rc4mod_class, key),   0, "rc4mod key"},
+    {"key",  T_ULONG,     offsetof(rc4mod_class_t, key),   0, "rc4mod key"},
     
     {NULL}  /* Sentinel */
 };
@@ -78,7 +78,7 @@ static PyMemberDef rc4mod_class_members[] = {
 /******************************************************************************
   Private Functions
 ******************************************************************************/
-static int rc4mod_my_private_method_param(rc4mod_class* self, uint32_t key)
+static int rc4mod_my_private_method_param(rc4mod_class_t* self, uint32_t key)
 {
     /* store in class context */
     self->key = (uint8_t)key;
@@ -176,7 +176,7 @@ static PyMethodDef rc4mod_class_methods[] = {
 static PyTypeObject rc4mod_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "pyrc4.Rc4",               /* tp_name */
-    sizeof(rc4mod_class),             /* tp_basicsize */
+    sizeof(rc4mod_class_t),           /* tp_basicsize */
     0,                                              /* tp_itemsize */
     (destructor)rc4mod_class_dealloc, /* tp_dealloc */
     0,                                              /* tp_print */

@@ -10,23 +10,17 @@
 typedef struct {
     PyObject_HEAD
     
-    /* example how to define a public attribute */
-    uint8_t key;
+    /* private attributes if not declared in {{MODULE_NAMESPACE}}_class_members[] below */
+    rc4_ctxt_t ctxt;
 
+    uint32_t count;
+    
 } {{MODULE_NAMESPACE}}_class_t;
 
 
 static void
 {{MODULE_NAMESPACE}}_class_dealloc({{MODULE_NAMESPACE}}_class_t* self)
 {
-    {% if OWN_CLOSE_FUNC is defined %}    
-    if (NULL != self->h)
-    {
-        {{OWN_CLOSE_FUNC}}(self->h);
-        self->h = NULL;
-    }
-    {% endif %}
-
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -36,18 +30,11 @@ static PyObject *
     {{MODULE_NAMESPACE}}_class_t *self;
 
     self = ({{MODULE_NAMESPACE}}_class_t *)type->tp_alloc(type, 0);
-    if (self != NULL) {
-        {% if OWN_OPEN_FUNC is defined %}
-        /* on fait l'open là, car s'il échoue on ne créé pas l'objet */
-        self->h = {{OWN_OPEN_FUNC}}();
-
-        if (NULL == self->h) {
-            /* ERROR ! */
-            self = NULL;
-        }
-        {% endif %}
+    if (self)
+    {
+        self->count = 0;
     }
-
+    
     return (PyObject *)self;
 }
 
@@ -59,17 +46,24 @@ static PyObject *
 static int
 {{MODULE_NAMESPACE}}_class_init({{MODULE_NAMESPACE}}_class_t *self, PyObject *args, PyObject *kwds)
 {
+    Py_buffer buffer; /* input buffer */
+    unsigned int maxlen;
+
+    /* Example, expect a Bytes sequence which is the key */
     if (!PyArg_ParseTuple(
             args,
-            "" // No argument expected
-       )
+            "s*",
+            &buffer,
+            &maxlen)
         ) {
+        PyErr_SetString(PyExc_AttributeError, "key argument must be a bytes()");
         return -1;
     }
 
-    /* FILL */
+    /* call to proper init function */
+    rc4_init(buffer.buf, buffer.len, &self->ctxt);
 
-    /* GOOD */
+    /* OK */
     return 0;
 }
 
@@ -77,22 +71,14 @@ static int
  {{MODULE_NAMESPACE}} Class Public Attributes
 ******************************************************************************/
 static PyMemberDef {{MODULE_NAMESPACE}}_class_members[] = {
-    {"key",  T_ULONG,     offsetof({{MODULE_NAMESPACE}}_class_t, key),   0, "{{MODULE_NAMESPACE}} key"},
-    
+    {"count",  T_ULONG,     offsetof({{MODULE_NAMESPACE}}_class_t, count),   0, "{{MODULE_NAMESPACE}} number of generated RC4 bytes"},
+
     {NULL}  /* Sentinel */
 };
 
 /******************************************************************************
-  Private Functions
+ Public methods
 ******************************************************************************/
-static int {{MODULE_NAMESPACE}}_my_private_method_param({{MODULE_NAMESPACE}}_class_t* self, uint32_t key)
-{
-    /* store in class context */
-    self->key = (uint8_t)key;
-    printf("Key 0x%.2x\n", self->key);
-    
-    return self->key;
-}
 
 /******************************************************************************
 {{MODULE_NAMESPACE}} Class Public Methods
@@ -103,9 +89,6 @@ static int {{MODULE_NAMESPACE}}_my_private_method_param({{MODULE_NAMESPACE}}_cla
 
 
 static PyMethodDef {{MODULE_NAMESPACE}}_class_methods[] = {
-    {% for meth in CLASS_METHODS %}
-    {"{{meth}}", (PyCFunction){{MODULE_NAMESPACE}}_{{meth}},  METH_VARARGS, "{{CLASS_METHODS[meth][1]}}" },
-    {% endfor %}
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -136,8 +119,8 @@ static PyTypeObject {{MODULE_NAMESPACE}}_type = {
     0,                                              /* tp_clear */
     0,                                              /* tp_richcompare */
     0,                                              /* tp_weaklistoffset */
-    0,                                              /* tp_iter */
-    0,                                              /* tp_iternext */
+    PyObject_SelfIter,                              /* tp_iter */
+    {{MODULE_NAMESPACE}}_class_{{NEXT_METHOD_NAME}},/* tp_iternext */
     {{MODULE_NAMESPACE}}_class_methods,             /* tp_methods */
     {{MODULE_NAMESPACE}}_class_members,             /* tp_members */
     0,                                              /* tp_getset */
@@ -183,7 +166,7 @@ PyInit_{{MODULE_NAME}}(void)
     if (m == NULL) {
         return NULL;
     }
-    
+
     /* ajout du type au module */
     Py_INCREF(&{{MODULE_NAMESPACE}}_type);
     PyModule_AddObject(

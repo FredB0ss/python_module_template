@@ -1,0 +1,3 @@
+
+# render with our own template
+python3 ../render.py -t template_module_class_iter_rc4_c rc4.yaml > pyrc4.c.tmp

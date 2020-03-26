@@ -21,11 +21,11 @@ typedef struct {
     rc4_ctxt_t ctxt;
     */
 
-} rc4iter_class;
+} rc4iter_class_t;
 
 
 static void
-rc4iter_class_dealloc(rc4iter_class* self)
+rc4iter_class_dealloc(rc4iter_class_t* self)
 {
     
 
@@ -35,9 +35,9 @@ rc4iter_class_dealloc(rc4iter_class* self)
 static PyObject *
 rc4iter_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    rc4iter_class *self;
+    rc4iter_class_t *self;
 
-    self = (rc4iter_class *)type->tp_alloc(type, 0);
+    self = (rc4iter_class_t *)type->tp_alloc(type, 0);
     if (self != NULL) {
         
     }
@@ -51,7 +51,7 @@ rc4iter_class_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  You may fill the blank if needed
 *******************************************************************************/
 static int
-rc4iter_class_init(rc4iter_class *self, PyObject *args, PyObject *kwds)
+rc4iter_class_init(rc4iter_class_t *self, PyObject *args, PyObject *kwds)
 {
     Py_buffer buffer; /* input buffer */
     unsigned int maxlen;
@@ -128,7 +128,7 @@ static PyMethodDef rc4iter_class_methods[] = {
 static PyTypeObject rc4iter_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "pyrc4.Rc4",               /* tp_name */
-    sizeof(rc4iter_class),             /* tp_basicsize */
+    sizeof(rc4iter_class_t),           /* tp_basicsize */
     0,                                              /* tp_itemsize */
     (destructor)rc4iter_class_dealloc, /* tp_dealloc */
     0,                                              /* tp_print */

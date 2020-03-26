@@ -1,0 +1,6 @@
+
+echo "Cleaning..."
+rm -rf build/
+rm -f rc4.o librc4.a pyrc4.so
+rm -f pyrc4.c.tmp
+echo "Done."
