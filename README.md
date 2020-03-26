@@ -51,17 +51,17 @@ No installation required per se. Just copy the directory containing the render.p
 
 The YAML specifications contains the common following fields:
 
-MODEL: <model>
+MODEL: *model*
 
-model is either:
+*model* is either:
 
 - flat: module with global functions only
 - class: module implementing a class
 - class_iter: module implementing an iterator kind of a class
 
-MODULE_NAME: <name> module name as seen by the Python interpreter.
+MODULE_NAME: *name*, module name as seen by the Python interpreter.
 
-MODULE_DOC: <string> description of the module, highly recommended.
+MODULE_DOC: *string*, description of the module, highly recommended.
 
 MODULE_NAMESPACE: <name> This name is solely used in the C implementation.
 
@@ -69,34 +69,40 @@ OWN_INCLUDES: <string> list of needed C includes - formatted as C lines
 
 ## flat module
 
-MODULE_FUNCTIONS: <dict>
+MODULE_FUNCTIONS: *dict*
+
 This dictionary provides the list of the functions to template, for each function the prototype under the form of an annotated Python function declaration and a documentation string are provided:
-<funcname>: [ <prototype>, <docstring>]
+
+*funcname*: [*prototype*, *docstring* ]
 
 Example:
+
+```YAML
   MODULE_FUNCTIONS:
     "init": [ "init(key: bytes) -> None", "Init function" ]
     "next": [ "next() -> int", "Next function, gives back the next RC4 byte" ]
+```
 
 ## class module
 
-CLASS_METHODS: <dict>
+CLASS_METHODS: *dict*
 A dictionary of functions, same as above.
 
 ## class_iter module
 
-NEXT_METHOD:
-A dictionary of a function, with one single entry describing the "next" function of the iterator.
+NEXT_METHOD: *dict*
+A dictionary of a function, with one single entry describing the "next" function of the iterator. Though unecessary this keeps the same syntax as CLASS_METHODS
 
 Example:
 
+```YAML
   NEXT_METHOD:
     "my_next": [ "my_next() -> long", "Gives next RC4 byte" ]
-
+```
 
 Optionaly the iterator class may be augmented with others methods, using the following field:
 
-CLASS_METHODS: <dict>
+CLASS_METHODS: *dict*
 A dictionary of functions, same as above.
 
 
@@ -109,8 +115,9 @@ A dictionary of functions, same as above.
 
 In the directory example/ a complete example is provided. The objective is to build an iterator class module which produces RC4 bytes. The RC4 implementation is provided by a disctinct C file, rc4.c. The YAML specifications for the iterator are available as rc4.yaml. The rendering is based on a dedicated template, template_module_class_iter_rc4_c.
 
-In the end the proposed module is an iterator rougly equivalent to the following pure Python code:
+In the end the proposed module is an iterator roughly equivalent to the following pure Python code:
 
+```Python
 class Rc4:
     def __init__(self, key):
         count = 0
@@ -119,6 +126,7 @@ class Rc4:
         return rc4_next()
     def __iter__(self):
         return self
+```
 
 The steps to build the module are:
 
@@ -139,18 +147,20 @@ python3 ../render.py -t template_module_class_iter_rc4_c rc4.yaml > pyrc4.c.tmp
 
 - A setup.py is provided to build everything, it refers to both librc4.a and pyrc4.c files:
 
-  import distutils.core
-  my_module = distutils.core.Extension(
-      "pyrc4",
-      sources = ["pyrc4.c"],
-      include_dirs=[".", ],
-      libraries=["rc4"],
-      library_dirs=["."],
-  )
-  distutils.core.setup(
-      name = "PyRC4",
-      ext_modules = [my_module],
-  )
+```Python
+import distutils.core
+my_module = distutils.core.Extension(
+    "pyrc4",
+    sources = ["pyrc4.c"],
+    include_dirs=[".", ],
+    libraries=["rc4"],
+    library_dirs=["."],
+)
+distutils.core.setup(
+    name = "PyRC4",
+    ext_modules = [my_module],
+)
+```
 
 - Build the Python module:
 
