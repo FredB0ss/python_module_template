@@ -1,7 +1,15 @@
 # python_module_template
+
 This script renders a skeleton of a C file for a Python module, based on a specifications written in YAML.
 
-The rendering
+PyYAML brings the specifications support, thank you:
+https://pyyaml.org/
+https://github.com/yaml/pyyaml
+
+JINJA2 offers the templating & rendering mechanisms, kudos:
+https://jinja.palletsprojects.com/
+
+Both are indexed in the PyPi: https://pypi.org
 
 # Discussion
 
