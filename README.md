@@ -123,68 +123,82 @@ class Rc4:
 The steps to build the module are:
 
 - In the directory example:
+
   cd example/
+  
 - Build the RC4 C library & archive:
+
   gcc -Wall -Wextra -o rc4.o -c rc4.c
   ar -crs  librc4.a rc4.o
+  
 - Render the template for an iterator class into a temporary C file:
+
 python3 ../render.py -t template_module_class_iter_rc4_c rc4.yaml > pyrc4.c.tmp
-- Manually edit the C file, fill the blanks and save it as pyrc4.c
+
+- Manually edit the C file, fill the blanks and save it as pyrc4.c (final version is provided)
+
 - A setup.py is provided to build everything, it refers to both librc4.a and pyrc4.c files:
-import distutils.core
 
-# compilation du .so
-my_module = distutils.core.Extension(
-    "pyrc4",
-    sources = ["pyrc4.c"],
-    include_dirs=[".", ],
-    libraries=["rc4"],
-    library_dirs=["."],
-)
+  import distutils.core
+  my_module = distutils.core.Extension(
+      "pyrc4",
+      sources = ["pyrc4.c"],
+      include_dirs=[".", ],
+      libraries=["rc4"],
+      library_dirs=["."],
+  )
+  distutils.core.setup(
+      name = "PyRC4",
+      ext_modules = [my_module],
+  )
 
-distutils.core.setup(
-    name = "PyRC4",
-    ext_modules = [my_module],
-)
 - Build the Python module:
+
   python3 setup.py build
+  
 - Retrieve the .so module:
+
   cp build/lib.*/pyrc4.*.so pyrc4.so
-- You may use everywhere!
+  
+- You may use everywhere!:
+
   cp pyrc4.so /tmp
   cd /tmp && python3
-Python 3.7.6 (default, Dec 19 2019, 09:25:23) 
-[GCC 9.2.1 20191130] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> import pyrc4
->>> dir(pyrc4)
-['Rc4', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__']
->>> o = pyrc4.Rc4(b"Fred")
->>> type(o)
-<class 'pyrc4.Rc4'>
->>> o.count
-0
->>> o.__next__()
-195
->>> o.count
-1
->>> for i, x in enumerate(o):
-...     print(i, hex(x))
-...     if 10 == i: break
-... 
-0 0x1d
-1 0x11
-2 0xfe
-3 0x73
-4 0x6a
-5 0x59
-6 0x15
-7 0xce
-8 0xba
-9 0x70
-10 0x73
->>> 
 
+- Use it in Python:
+
+  Python 3.7.6 (default, Dec 19 2019, 09:25:23) 
+  [GCC 9.2.1 20191130] on linux
+  Type "help", "copyright", "credits" or "license" for more information.
+  >>> import pyrc4
+  >>> dir(pyrc4)
+  ['Rc4', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__']
+  >>> o = pyrc4.Rc4(b"Fred")
+  >>> type(o)
+  <class 'pyrc4.Rc4'>
+  >>> o.count
+  0
+  >>> o.__next__()
+  195
+  >>> o.count
+  1
+  >>> for i, x in enumerate(o):
+  ...     print(i, hex(x))
+  ...     if 10 == i: break
+  ... 
+  0 0x1d
+  1 0x11
+  2 0xfe
+  3 0x73
+  4 0x6a
+  5 0x59
+  6 0x15
+  7 0xce
+  8 0xba
+  9 0x70
+  10 0x73
+  >>> 
+  
   
 
 
