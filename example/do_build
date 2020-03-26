@@ -11,7 +11,7 @@ echo "Build..."
 
 # version statique
 echo "Compiling rc4.c"
-gcc -Wall -Wextra -I .. -o rc4.o -c rc4.c
+gcc -Wall -Wextra -o rc4.o -c rc4.c
 
 echo "Creating librc4.a archive"
 ar -crs  librc4.a rc4.o 
