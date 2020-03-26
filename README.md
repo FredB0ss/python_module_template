@@ -49,7 +49,9 @@ No installation required per se. Just copy the directory containing the render.p
 
 # YAML specifications
 
-The YAML specifications contains the common following fields:
+## Common Fields
+
+The YAML specifications must contain the following fields:
 
 MODEL: *model*
 
@@ -63,32 +65,69 @@ MODULE_NAME: *name*, module name as seen by the Python interpreter.
 
 MODULE_DOC: *string*, description of the module, highly recommended.
 
-MODULE_NAMESPACE: <name> This name is solely used in the C implementation.
+MODULE_NAMESPACE: *name*, This name is solely used in the C implementation.
 
-OWN_INCLUDES: <string> list of needed C includes - formatted as C lines
+OWN_INCLUDES: *string*, list of needed C includes - formatted as C lines
 
-## flat module
+Example:
+```YAML
+OWN_INCLUDES: "#include <stdio.h>\n#include <stdlib.h>\n#include \"rc4.h\"\n"
+```
+
+## Flat Module
+
+A flat module is described by a list of C functions.
 
 MODULE_FUNCTIONS: *dict*
 
 This dictionary provides the list of the functions to template, for each function the prototype under the form of an annotated Python function declaration and a documentation string are provided:
 
-*funcname*: [*prototype*, *docstring* ]
+*funcname*: [ *prototype*, *docstring* ]
 
 Example:
-
 ```YAML
   MODULE_FUNCTIONS:
     "init": [ "init(key: bytes) -> None", "Init function" ]
     "next": [ "next() -> int", "Next function, gives back the next RC4 byte" ]
 ```
 
-## class module
+### Flat Module Specifications Example
+
+```YAML
+MODEL: flat
+MODULE_NAME: pyrc4
+MODULE_DOC: This module implements functions to wrap the RC4 C library
+MODULE_NAMESPACE: rc4mod
+OWN_INCLUDES: "#include <stdint.h>\n#include \"rc4.h\"\n"
+MODULE_FUNCTIONS:
+  "init": [ "init(key: bytes) -> None", "Init function" ]
+  "next": [ "next() -> int", "Next function, gives back the next RC4 byte" ]
+```
+
+## Class module
+
+Additionaly to the above common fields a class is described by the list of its methods:
 
 CLASS_METHODS: *dict*
-A dictionary of functions, same as above.
+A dictionary of functions, same as MODULE_FUNCTIONS above.
 
-## class_iter module
+### Class Module Specifications Example
+
+```YAML
+MODEL: class
+MODULE_NAME: pyrc4
+MODULE_DOC: This module implements a Python class to wrap the RC4 C library
+CLASS_NAME: Rc4
+MODULE_NAMESPACE: rc4mod
+OWN_INCLUDES: "#include <stdio.h>\n#include <stdlib.h>\n"
+CLASS_METHODS:
+  "key": [ "key(key: bytes) -> None", "Key Init function" ]
+  "doit": [ "doit() -> int", "Gives an RC4 byte" ]
+```
+
+## Iterator Class module
+
+Additionaly to the above common fields an iterator is described by its next function. It is up to the developper to implement the init function in the resulting generated C file :
 
 NEXT_METHOD: *dict*
 A dictionary of a function, with one single entry describing the "next" function of the iterator. Though unecessary this keeps the same syntax as CLASS_METHODS
@@ -105,6 +144,18 @@ Optionaly the iterator class may be augmented with others methods, using the fol
 CLASS_METHODS: *dict*
 A dictionary of functions, same as above.
 
+### Iterator Class Module Specifications Example
+
+```YAML
+MODEL: class_iter
+MODULE_NAME: pyrc4
+MODULE_DOC: This module implements an iterator class to wrap the RC4 C library
+CLASS_NAME: Rc4
+MODULE_NAMESPACE: rc4iter
+OWN_INCLUDES: "#include <stdio.h>\n#include <stdlib.h>\n"
+NEXT_METHOD:
+  "my_next": [ "my_next() -> long", "Gives next RC4 byte" ]
+```
 
 # Tests
 
